@@ -1,3 +1,4 @@
+import { getSession } from 'next-auth/react';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
 import { ApolloServerPluginDrainHttpServer } from '@apollo/server/plugin/drainHttpServer';
@@ -9,6 +10,8 @@ import typeDefs from './graphql/type-defs';
 import resolvers from './graphql/resolvers';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
+import fetch from 'node-fetch';
+import { GraphQlContext } from './utils/types';
 
 interface MyContext {
   token?: String;
@@ -18,6 +21,14 @@ const schema = makeExecutableSchema({
   typeDefs,
   resolvers,
 });
+
+export const getServerSession = async (cookie: string) => {
+  const res = await fetch('http://localhost:3000/api/auth/session', {
+    headers: { cookie },
+  });
+  const session = await res.json();
+  return session;
+};
 
 const main = async () => {
   dotenv.config();
@@ -36,7 +47,10 @@ const main = async () => {
     }),
     json(),
     expressMiddleware(server, {
-      context: async ({ req }) => ({ token: req.headers.token }),
+      context: async ({ req }): Promise<GraphQlContext> => {
+        const session = await getServerSession(req.headers.cookie as string);
+        return { session };
+      },
     })
   );
 

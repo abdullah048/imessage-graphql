@@ -24,6 +24,8 @@
     "cors": "^2.8.5",
     "dotenv": "^16.0.3",
     "lodash.merge": "^4.6.2",
+    "next-auth": "^4.22.1",
+    "node-fetch": "^2.6.11",
     "ts-node": "^10.9.1"
   }
 }
