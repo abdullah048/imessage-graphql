@@ -20,7 +20,8 @@ const Auth: FC<IAuthProps> = props => {
     CreateUsernameVariables
   >(UserOperations.Mutations.createUsername);
 
-  console.log('Response =>', data, loading, error);
+  // console.log('Response =>', data, loading, error);
+  console.log('session =>', session);
 
   const onSubmit = async () => {
     try {

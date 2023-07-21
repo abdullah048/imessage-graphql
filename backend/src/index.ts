@@ -1,3 +1,4 @@
+import { PrismaClient } from '@prisma/client';
 import { getSession } from 'next-auth/react';
 import { ApolloServer } from '@apollo/server';
 import { expressMiddleware } from '@apollo/server/express4';
@@ -13,6 +14,7 @@ import * as dotenv from 'dotenv';
 import fetch from 'node-fetch';
 import { GraphQlContext } from './utils/types';
 
+const prisma = new PrismaClient();
 interface MyContext {
   token?: String;
 }
@@ -49,7 +51,7 @@ const main = async () => {
     expressMiddleware(server, {
       context: async ({ req }): Promise<GraphQlContext> => {
         const session = await getServerSession(req.headers.cookie as string);
-        return { session };
+        return { session, prisma };
       },
     })
   );
