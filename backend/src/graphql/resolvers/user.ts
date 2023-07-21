@@ -14,7 +14,7 @@ const resolvers = {
       const { session, prisma } = context;
       console.log('Username Resolver', username, context);
     },
-  },
+  }, // TODO: Add function return type
   // Subscription: {},
 };
 
