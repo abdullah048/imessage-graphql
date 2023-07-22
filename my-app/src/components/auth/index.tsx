@@ -48,6 +48,8 @@ const Auth: FC<IAuthProps> = props => {
     }
   };
 
+  // NOTE: Weird error 'Expression produces a union type too complex to represent' mainly because TS and Chakra-UI
+
   return (
     <Center height='100vh'>
       <VStack spacing={3}>
@@ -70,7 +72,7 @@ const Auth: FC<IAuthProps> = props => {
             )}
             <Button
               isLoading={loading}
-              loadingText='Submitting'
+              loadingText='Saving'
               width='100%'
               onClick={onSubmit}>
               Save
@@ -81,7 +83,7 @@ const Auth: FC<IAuthProps> = props => {
             <Text fontSize='3xl'>iMessageApp</Text>
             <Button
               isLoading={sessionLoading}
-              loadingText='Loading...'
+              loadingText='Loading'
               onClick={() => {
                 setSessionLoading(true);
                 signIn('google');
