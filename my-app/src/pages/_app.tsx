@@ -4,6 +4,7 @@ import { ChakraProvider } from '@chakra-ui/react';
 import { SessionProvider } from 'next-auth/react';
 import type { AppProps } from 'next/app';
 import { theme } from '../chakra/theme';
+import { Toaster } from 'react-hot-toast';
 export default function App({
   Component,
   pageProps: { session, ...pageProps },
@@ -13,6 +14,7 @@ export default function App({
       <SessionProvider session={session}>
         <ChakraProvider theme={theme}>
           <Component {...pageProps} />
+          <Toaster />
         </ChakraProvider>
       </SessionProvider>
     </ApolloProvider>

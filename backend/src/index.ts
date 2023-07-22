@@ -12,7 +12,7 @@ import resolvers from './graphql/resolvers';
 import cors from 'cors';
 import * as dotenv from 'dotenv';
 import fetch from 'node-fetch';
-import { GraphQlContext } from './utils/types';
+import { GraphQlContext, Session } from './utils/types';
 
 const prisma = new PrismaClient();
 interface MyContext {
@@ -24,7 +24,7 @@ const schema = makeExecutableSchema({
   resolvers,
 });
 
-export const getServerSession = async (cookie: string) => {
+export const getServerSession = async (cookie: string): Promise<Session> => {
   const res = await fetch('http://localhost:3000/api/auth/session', {
     headers: { cookie },
   });

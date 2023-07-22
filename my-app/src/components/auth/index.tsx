@@ -5,6 +5,7 @@ import { Session } from 'next-auth';
 import { signIn } from 'next-auth/react';
 import React, { FC, Fragment, useState } from 'react';
 import UserOperations from '../../graphql/operations/user';
+import { toast } from 'react-hot-toast';
 
 interface IAuthProps {
   session: Session | null;
@@ -13,23 +14,37 @@ interface IAuthProps {
 
 const Auth: FC<IAuthProps> = props => {
   const { session, reloadSession } = props;
-  const [username, setUsername] = useState('');
+  const [username, setUsername] = useState<string>('');
+  const [showError, setShowError] = useState<boolean>(false);
+  const [sessionLoading, setSessionLoading] = useState<boolean>(false);
 
-  const [createUsername, { data, loading, error }] = useMutation<
+  const [createUsername, { loading, error }] = useMutation<
     CreateUsernameData,
     CreateUsernameVariables
   >(UserOperations.Mutations.createUsername);
 
-  // console.log('Response =>', data, loading, error);
-  console.log('session =>', session);
-
   const onSubmit = async () => {
     try {
-      if (!username) return;
-      await createUsername({ variables: { username } });
+      if (!username) return setShowError(true);
+      const { data } = await createUsername({ variables: { username } });
+      if (!data?.createUsername) {
+        throw new Error();
+      }
+
+      if (data.createUsername.error) {
+        const {
+          createUsername: { error },
+        } = data;
+        throw new Error(error);
+      }
+      toast.success('Username successfully created! 🚀');
+      // NOTE: reload session to obtain new username...
+      reloadSession();
     } catch (error) {
-      if (error instanceof Error)
+      if (error instanceof Error) {
+        toast.error(error.message);
         console.log(`On submit Error: ${error.message}`);
+      }
     }
   };
 
@@ -44,7 +59,20 @@ const Auth: FC<IAuthProps> = props => {
               value={username}
               onChange={e => setUsername(e.target.value)}
             />
-            <Button width='100%' onClick={onSubmit}>
+            {showError && (
+              <Text
+                width={'100%'}
+                marginTop={'5px'}
+                fontSize='medium'
+                color='red'>
+                This field is required
+              </Text>
+            )}
+            <Button
+              isLoading={loading}
+              loadingText='Submitting'
+              width='100%'
+              onClick={onSubmit}>
               Save
             </Button>
           </VStack>
@@ -52,7 +80,12 @@ const Auth: FC<IAuthProps> = props => {
           <Fragment>
             <Text fontSize='3xl'>iMessageApp</Text>
             <Button
-              onClick={() => signIn('google')}
+              isLoading={sessionLoading}
+              loadingText='Loading...'
+              onClick={() => {
+                setSessionLoading(true);
+                signIn('google');
+              }}
               leftIcon={
                 <Image
                   borderRadius='full'
